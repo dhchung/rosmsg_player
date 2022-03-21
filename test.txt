@@ -1,0 +1,22 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ROS Message Player for Pohang Canal Dataset
+
+
+It is programmed to drop some messages when the sensor message time is too different from current time
+Radar data is updated parts by parts, so if this happens, some parts of the images would be omitted
+
+
+This is the first version, and we are working on it to improve such issues.

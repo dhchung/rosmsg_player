@@ -38,6 +38,24 @@ private slots:
     void TimeLineSliderReleased();
     void PlayRateChanged(double play_rate);
     
+    void on_checkBox_GPS_clicked(bool checked);
+
+    void on_checkBox_AHRS_clicked(bool checked);
+
+    void on_checkBox_Stereo_clicked(bool checked);
+
+    void on_checkBox_Infrared_toggled(bool checked);
+
+    void on_checkBox_Omni_clicked(bool checked);
+
+    void on_checkBox_LiDAR_Front_clicked(bool checked);
+
+    void on_checkBox_LiDAR_Port_clicked(bool checked);
+
+    void on_checkBox_LiDAR_Starboard_clicked(bool checked);
+
+    void on_checkBox_Radar_clicked(bool checked);
+
 signals:
     void TimeReset();
 

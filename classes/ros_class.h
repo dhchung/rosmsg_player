@@ -67,6 +67,18 @@ public:
     float infrared_min_temp;
     float infrared_max_temp;
 
+    bool play_GPS;
+    bool play_AHRS;
+    bool play_Stereo;
+    bool play_Infrared;
+    bool play_Omni;
+    bool play_LiDAR_Front;
+    bool play_LiDAR_Port;
+    bool play_LiDAR_Starboard;
+    bool play_Radar;
+
+
+
 
 signals:
     void TimeChanged(float time, float percent);

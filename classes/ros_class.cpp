@@ -39,6 +39,16 @@ ROSClass::ROSClass(QObject * parent): QThread(parent){
     cv::rectangle(radar_mask_half_rectangle, cv::Rect(cv::Point(0, 0), cv::Point(1023, 2048)), cv::Scalar(255), -1);
     radar_currently_loaded = -1;
 
+    play_GPS = false;
+    play_AHRS = false;
+    play_Stereo = false;
+    play_Infrared = false;
+    play_Omni = false;
+    play_LiDAR_Front = false;
+    play_LiDAR_Port = false;
+    play_LiDAR_Starboard = false;
+    play_Radar = false;
+
 }
 
 ROSClass::~ROSClass(){
@@ -850,81 +860,79 @@ void ROSClass::OmniThread() {
                 continue;
             }
 
+            std::string cam_0_img_dir = omni_0_dir + "/" + data.second;
+            std::string cam_1_img_dir = omni_1_dir + "/" + data.second;
+            std::string cam_2_img_dir = omni_2_dir + "/" + data.second;
+            std::string cam_3_img_dir = omni_3_dir + "/" + data.second;
+            std::string cam_4_img_dir = omni_4_dir + "/" + data.second;
+            std::string cam_5_img_dir = omni_5_dir + "/" + data.second;
 
+            cv::Mat omni_img_0;
+            cv::Mat omni_img_1;
+            cv::Mat omni_img_2;
+            cv::Mat omni_img_3;
+            cv::Mat omni_img_4;
+            cv::Mat omni_img_5;
 
-            // std::string cam_0_img_dir = omni_0_dir + "/" + data.second;
-            // std::string cam_1_img_dir = omni_1_dir + "/" + data.second;
-            // std::string cam_2_img_dir = omni_2_dir + "/" + data.second;
-            // std::string cam_3_img_dir = omni_3_dir + "/" + data.second;
-            // std::string cam_4_img_dir = omni_4_dir + "/" + data.second;
-            // std::string cam_5_img_dir = omni_5_dir + "/" + data.second;
+            // cv::Mat omni_img_0 = cv::imread(cam_0_img_dir, cv::IMREAD_COLOR);
+            // cv::Mat omni_img_1 = cv::imread(cam_1_img_dir, cv::IMREAD_COLOR);
+            // cv::Mat omni_img_2 = cv::imread(cam_2_img_dir, cv::IMREAD_COLOR);
+            // cv::Mat omni_img_3 = cv::imread(cam_3_img_dir, cv::IMREAD_COLOR);
+            // cv::Mat omni_img_4 = cv::imread(cam_4_img_dir, cv::IMREAD_COLOR);
+            // cv::Mat omni_img_5 = cv::imread(cam_5_img_dir, cv::IMREAD_COLOR);
 
-            // cv::Mat omni_img_0;
-            // cv::Mat omni_img_1;
-            // cv::Mat omni_img_2;
-            // cv::Mat omni_img_3;
-            // cv::Mat omni_img_4;
-            // cv::Mat omni_img_5;
+            std::thread load_omni_0(&ROSClass::load_color_img, this, std::ref(omni_img_0), cam_0_img_dir);
+            std::thread load_omni_1(&ROSClass::load_color_img, this, std::ref(omni_img_1), cam_1_img_dir);
+            std::thread load_omni_2(&ROSClass::load_color_img, this, std::ref(omni_img_2), cam_2_img_dir);
+            std::thread load_omni_3(&ROSClass::load_color_img, this, std::ref(omni_img_3), cam_3_img_dir);
+            std::thread load_omni_4(&ROSClass::load_color_img, this, std::ref(omni_img_4), cam_4_img_dir);
+            std::thread load_omni_5(&ROSClass::load_color_img, this, std::ref(omni_img_5), cam_5_img_dir);
 
-            // // cv::Mat omni_img_0 = cv::imread(cam_0_img_dir, cv::IMREAD_COLOR);
-            // // cv::Mat omni_img_1 = cv::imread(cam_1_img_dir, cv::IMREAD_COLOR);
-            // // cv::Mat omni_img_2 = cv::imread(cam_2_img_dir, cv::IMREAD_COLOR);
-            // // cv::Mat omni_img_3 = cv::imread(cam_3_img_dir, cv::IMREAD_COLOR);
-            // // cv::Mat omni_img_4 = cv::imread(cam_4_img_dir, cv::IMREAD_COLOR);
-            // // cv::Mat omni_img_5 = cv::imread(cam_5_img_dir, cv::IMREAD_COLOR);
-
-            // std::thread load_omni_0(&ROSClass::load_color_img, this, std::ref(omni_img_0), cam_0_img_dir);
-            // std::thread load_omni_1(&ROSClass::load_color_img, this, std::ref(omni_img_1), cam_1_img_dir);
-            // std::thread load_omni_2(&ROSClass::load_color_img, this, std::ref(omni_img_2), cam_2_img_dir);
-            // std::thread load_omni_3(&ROSClass::load_color_img, this, std::ref(omni_img_3), cam_3_img_dir);
-            // std::thread load_omni_4(&ROSClass::load_color_img, this, std::ref(omni_img_4), cam_4_img_dir);
-            // std::thread load_omni_5(&ROSClass::load_color_img, this, std::ref(omni_img_5), cam_5_img_dir);
-
-            // load_omni_0.join();
-            // load_omni_1.join();
-            // load_omni_2.join();
-            // load_omni_3.join();
-            // load_omni_4.join();
-            // load_omni_5.join();
+            load_omni_0.join();
+            load_omni_1.join();
+            load_omni_2.join();
+            load_omni_3.join();
+            load_omni_4.join();
+            load_omni_5.join();
 
 
 
 
-            // std_msgs::Header cam_0_msg_header;
-            // cam_0_msg_header.frame_id = "omni_cam_0_link";
-            // cam_0_msg_header.stamp.fromSec(data.first);
-            // sensor_msgs::ImagePtr cam_0_msg = cv_bridge::CvImage(cam_0_msg_header, "bgr8", omni_img_0).toImageMsg();
-            // it_pub_omni_0.publish(cam_0_msg);
+            std_msgs::Header cam_0_msg_header;
+            cam_0_msg_header.frame_id = "omni_cam_0_link";
+            cam_0_msg_header.stamp.fromSec(data.first);
+            sensor_msgs::ImagePtr cam_0_msg = cv_bridge::CvImage(cam_0_msg_header, "bgr8", omni_img_0).toImageMsg();
+            it_pub_omni_0.publish(cam_0_msg);
 
-            // std_msgs::Header cam_1_msg_header;
-            // cam_1_msg_header.frame_id = "omni_cam_1_link";
-            // cam_1_msg_header.stamp.fromSec(data.first);
-            // sensor_msgs::ImagePtr cam_1_msg = cv_bridge::CvImage(cam_1_msg_header, "bgr8", omni_img_1).toImageMsg();
-            // it_pub_omni_1.publish(cam_1_msg);
+            std_msgs::Header cam_1_msg_header;
+            cam_1_msg_header.frame_id = "omni_cam_1_link";
+            cam_1_msg_header.stamp.fromSec(data.first);
+            sensor_msgs::ImagePtr cam_1_msg = cv_bridge::CvImage(cam_1_msg_header, "bgr8", omni_img_1).toImageMsg();
+            it_pub_omni_1.publish(cam_1_msg);
 
-            // std_msgs::Header cam_2_msg_header;
-            // cam_2_msg_header.frame_id = "omni_cam_2_link";
-            // cam_2_msg_header.stamp.fromSec(data.first);
-            // sensor_msgs::ImagePtr cam_2_msg = cv_bridge::CvImage(cam_2_msg_header, "bgr8", omni_img_2).toImageMsg();
-            // it_pub_omni_2.publish(cam_2_msg);
+            std_msgs::Header cam_2_msg_header;
+            cam_2_msg_header.frame_id = "omni_cam_2_link";
+            cam_2_msg_header.stamp.fromSec(data.first);
+            sensor_msgs::ImagePtr cam_2_msg = cv_bridge::CvImage(cam_2_msg_header, "bgr8", omni_img_2).toImageMsg();
+            it_pub_omni_2.publish(cam_2_msg);
 
-            // std_msgs::Header cam_3_msg_header;
-            // cam_3_msg_header.frame_id = "omni_cam_3_link";
-            // cam_3_msg_header.stamp.fromSec(data.first);
-            // sensor_msgs::ImagePtr cam_3_msg = cv_bridge::CvImage(cam_3_msg_header, "bgr8", omni_img_3).toImageMsg();
-            // it_pub_omni_3.publish(cam_3_msg);
+            std_msgs::Header cam_3_msg_header;
+            cam_3_msg_header.frame_id = "omni_cam_3_link";
+            cam_3_msg_header.stamp.fromSec(data.first);
+            sensor_msgs::ImagePtr cam_3_msg = cv_bridge::CvImage(cam_3_msg_header, "bgr8", omni_img_3).toImageMsg();
+            it_pub_omni_3.publish(cam_3_msg);
 
-            // std_msgs::Header cam_4_msg_header;
-            // cam_4_msg_header.frame_id = "omni_cam_4_link";
-            // cam_4_msg_header.stamp.fromSec(data.first);
-            // sensor_msgs::ImagePtr cam_4_msg = cv_bridge::CvImage(cam_4_msg_header, "bgr8", omni_img_4).toImageMsg();
-            // it_pub_omni_4.publish(cam_4_msg);
+            std_msgs::Header cam_4_msg_header;
+            cam_4_msg_header.frame_id = "omni_cam_4_link";
+            cam_4_msg_header.stamp.fromSec(data.first);
+            sensor_msgs::ImagePtr cam_4_msg = cv_bridge::CvImage(cam_4_msg_header, "bgr8", omni_img_4).toImageMsg();
+            it_pub_omni_4.publish(cam_4_msg);
 
-            // std_msgs::Header cam_5_msg_header;
-            // cam_5_msg_header.frame_id = "omni_cam_5_link";
-            // cam_5_msg_header.stamp.fromSec(data.first);
-            // sensor_msgs::ImagePtr cam_5_msg = cv_bridge::CvImage(cam_5_msg_header, "bgr8", omni_img_5).toImageMsg();
-            // it_pub_omni_5.publish(cam_5_msg);
+            std_msgs::Header cam_5_msg_header;
+            cam_5_msg_header.frame_id = "omni_cam_5_link";
+            cam_5_msg_header.stamp.fromSec(data.first);
+            sensor_msgs::ImagePtr cam_5_msg = cv_bridge::CvImage(cam_5_msg_header, "bgr8", omni_img_5).toImageMsg();
+            it_pub_omni_5.publish(cam_5_msg);
 
         }
         if(!omni_dm.b_run) {
@@ -1115,7 +1123,7 @@ void ROSClass::DataPushThread() {
                 continue;
             }
 
-            if(time_stamp_data[cur_idx].second.first.compare("lidar_front") == 0) {
+            if(time_stamp_data[cur_idx].second.first.compare("lidar_front") == 0 && play_LiDAR_Front) {
                 std::pair<long double, std::string> time_path{
                     time_stamp_data[cur_idx].first,
                     time_stamp_data[cur_idx].second.second
@@ -1123,21 +1131,21 @@ void ROSClass::DataPushThread() {
                 lidar_front_dm.push(time_path);
                 lidar_front_dm.m_cv.notify_all();
 
-            }else if(time_stamp_data[cur_idx].second.first.compare("lidar_port") == 0) {
+            }else if(time_stamp_data[cur_idx].second.first.compare("lidar_port") == 0 && play_LiDAR_Port) {
                 std::pair<long double, std::string> time_path{
                     time_stamp_data[cur_idx].first,
                     time_stamp_data[cur_idx].second.second
                 };
                 lidar_port_dm.push(time_path);
                 lidar_port_dm.m_cv.notify_all();
-            }else if(time_stamp_data[cur_idx].second.first.compare("lidar_starboard") == 0) {
+            }else if(time_stamp_data[cur_idx].second.first.compare("lidar_starboard") == 0 && play_LiDAR_Starboard) {
                 std::pair<long double, std::string> time_path{
                     time_stamp_data[cur_idx].first,
                     time_stamp_data[cur_idx].second.second
                 };
                 lidar_starboard_dm.push(time_path);
                 lidar_starboard_dm.m_cv.notify_all();
-            }else if(time_stamp_data[cur_idx].second.first.compare("ahrs") == 0) {
+            }else if(time_stamp_data[cur_idx].second.first.compare("ahrs") == 0 && play_AHRS) {
                 std::pair<long double, std::string> time_data{
                     time_stamp_data[cur_idx].first,
                     time_stamp_data[cur_idx].second.second
@@ -1145,21 +1153,21 @@ void ROSClass::DataPushThread() {
                 ahrs_dm.push(time_data);
                 ahrs_dm.m_cv.notify_all();
 
-            }else if(time_stamp_data[cur_idx].second.first.compare("gps") == 0) {
+            }else if(time_stamp_data[cur_idx].second.first.compare("gps") == 0 && play_GPS) {
                 std::pair<long double, std::string> time_data{
                     time_stamp_data[cur_idx].first,
                     time_stamp_data[cur_idx].second.second
                 };
                 gps_dm.push(time_data);
                 gps_dm.m_cv.notify_all();
-            }else if(time_stamp_data[cur_idx].second.first.compare("stereo") == 0) {
+            }else if(time_stamp_data[cur_idx].second.first.compare("stereo") == 0 && play_Stereo) {
                 std::pair<long double, std::string> time_data{
                     time_stamp_data[cur_idx].first,
                     time_stamp_data[cur_idx].second.second
                 };
                 stereo_dm.push(time_data);
                 stereo_dm.m_cv.notify_all();
-            }else if(time_stamp_data[cur_idx].second.first.compare("infrared") == 0) {
+            }else if(time_stamp_data[cur_idx].second.first.compare("infrared") == 0 && play_Infrared) {
                 std::pair<long double, std::string> time_data{
                     time_stamp_data[cur_idx].first,
                     time_stamp_data[cur_idx].second.second
@@ -1167,14 +1175,14 @@ void ROSClass::DataPushThread() {
                 infrared_dm.push(time_data);
                 infrared_dm.m_cv.notify_all();
 
-            }else if(time_stamp_data[cur_idx].second.first.compare("omni") == 0) {
+            }else if(time_stamp_data[cur_idx].second.first.compare("omni") == 0 && play_Omni) {
                 std::pair<long double, std::string> time_data{
                     time_stamp_data[cur_idx].first,
                     time_stamp_data[cur_idx].second.second
                 };
                 omni_dm.push(time_data);
                 omni_dm.m_cv.notify_all();
-            }else if(time_stamp_data[cur_idx].second.first.compare("radar") == 0) {
+            }else if(time_stamp_data[cur_idx].second.first.compare("radar") == 0 && play_Radar) {
                 std::pair<long double, std::string> time_data{
                     time_stamp_data[cur_idx].first,
                     time_stamp_data[cur_idx].second.second

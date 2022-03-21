@@ -11,8 +11,15 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(roscpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(tf REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(pcl_ros REQUIRED)
 
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     std_msgs
@@ -22,10 +29,9 @@ find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
     tf
     nav_msgs
-    sensor_msgs
     pcl_ros
     pcl_conversions
-    pcl_msgs    
+    pcl_msgs
 )
 
 catkin_package(
@@ -38,10 +44,9 @@ catkin_package(
         geometry_msgs
         tf
         nav_msgs
-        sensor_msgs
         pcl_ros
         pcl_conversions
-        pcl_msgs   
+        pcl_msgs
 )
 
 include_directories(${catkin_INCLUDE_DIRS})

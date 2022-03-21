@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>798</width>
-    <height>192</height>
+    <height>215</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -100,7 +100,7 @@
       <x>20</x>
       <y>90</y>
       <width>241</width>
-      <height>71</height>
+      <height>91</height>
      </rect>
     </property>
     <property name="editTriggers">
@@ -210,6 +210,123 @@
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_GPS">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>140</y>
+      <width>51</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>GPS</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_AHRS">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>140</y>
+      <width>61</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>AHRS</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_Stereo">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>140</y>
+      <width>71</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stereo</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_Infrared">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>140</y>
+      <width>92</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Infrared</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_Omni">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>140</y>
+      <width>131</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Omnidirectional</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_LiDAR_Front">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>170</y>
+      <width>111</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>LiDAR Front</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_LiDAR_Port">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>170</y>
+      <width>101</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>LiDAR Port</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_LiDAR_Starboard">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>170</y>
+      <width>141</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>LiDAR Starboard</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_Radar">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>170</y>
+      <width>71</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Radar</string>
     </property>
    </widget>
   </widget>

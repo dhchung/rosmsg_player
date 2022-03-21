@@ -483,3 +483,39 @@ void MainWindow::TimeLineSliderReleased() {
         emit TimeReset();
     }
 }
+
+void MainWindow::on_checkBox_GPS_clicked(bool checked){
+    ros_->play_GPS = checked;
+}
+
+void MainWindow::on_checkBox_AHRS_clicked(bool checked){
+    ros_->play_AHRS = checked;
+}
+
+void MainWindow::on_checkBox_Stereo_clicked(bool checked){
+    ros_->play_Stereo = checked;
+}
+
+void MainWindow::on_checkBox_Infrared_toggled(bool checked){
+    ros_->play_Infrared = checked;
+}
+
+void MainWindow::on_checkBox_Omni_clicked(bool checked){
+    ros_->play_Omni = checked;
+}
+
+void MainWindow::on_checkBox_LiDAR_Front_clicked(bool checked){
+    ros_->play_LiDAR_Front = checked;
+}
+
+void MainWindow::on_checkBox_LiDAR_Port_clicked(bool checked){
+    ros_->play_LiDAR_Port = checked;
+}
+
+void MainWindow::on_checkBox_LiDAR_Starboard_clicked(bool checked){
+    ros_->play_LiDAR_Starboard = checked;
+}
+
+void MainWindow::on_checkBox_Radar_clicked(bool checked){
+    ros_->play_Radar = checked;
+}
