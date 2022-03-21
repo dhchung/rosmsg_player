@@ -3,6 +3,8 @@
 Inspired by IRAP file player (https://github.com/irapkaist/file_player).
 We thank them for providing the code.
 
+[Example video](https://www.youtube.com/watch?v=Gn_xkNfslrc)
+
 Plays ROS messages for the dataset folder composed as :
 
 ```
