@@ -3,13 +3,18 @@
 struct PointXYZIR {
     PCL_ADD_POINT4D;
     float intensity;
-    std::uint8_t ring;
     std::uint32_t t;
+    std::uint8_t ring;
+    std::uint16_t reflectivity;
+    std::uint16_t ambient;
+    std::uint32_t range;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
+
 POINT_CLOUD_REGISTER_POINT_STRUCT(PointXYZIR,
     (float, x, x) (float, y, y) (float, z, z) (float, intensity, intensity)
-    (std::uint8_t, ring, ring) (std::uint32_t, t, t)
+    (std::uint8_t, ring, ring) (std::uint32_t, t, t) (std::uint16_t, reflectivity, reflectivity) 
+    (std::uint16_t, ambient, ambient) (std::uint32_t, range, range)
 )
 
 ROSClass::ROSClass(QObject * parent): QThread(parent){
@@ -275,7 +280,7 @@ void ROSClass::TimerCallBack(const ros::TimerEvent & event) {
         }
 
     } else {
-
+        last_current_time = ros::Time::now().toSec();
     }
 
 }
@@ -394,6 +399,9 @@ void ROSClass::LidarFrontThread() {
                 pt.intensity = intensity;
                 pt.ring = (pt_no%64);
                 pt.t = time;
+                pt.reflectivity = reflectivity;
+                pt.ambient = ambient;
+                pt.range = range;
                 ++pt_no;
                 pcl_cloud.points.push_back(pt);
             }
@@ -467,6 +475,9 @@ void ROSClass::LidarPortThread() {
                 pt.intensity = intensity;
                 pt.ring = (pt_no%32);
                 pt.t = time;
+                pt.reflectivity = reflectivity;
+                pt.ambient = ambient;
+                pt.range = range;
                 ++pt_no;
                 pcl_cloud.points.push_back(pt);
             }
@@ -541,6 +552,9 @@ void ROSClass::LidarStarboardThread() {
                 pt.intensity = intensity;
                 pt.ring = (pt_no%64);
                 pt.t = time;
+                pt.reflectivity = reflectivity;
+                pt.ambient = ambient;
+                pt.range = range;
                 ++pt_no;
                 pcl_cloud.points.push_back(pt);
             }
@@ -609,6 +623,89 @@ void ROSClass::AHRSThread() {
 
             ros_ahrs.header.frame_id = "gx5_link";
             ahrs_pub.publish(ros_ahrs);
+
+
+
+            // while(std::getline(ss, phrase, '\t')) {
+            //     if(idx==0) {
+            //         ros_ahrs.orientation.x = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+            //     if(idx==1) {
+            //         ros_ahrs.orientation.y = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+            //     if(idx==2) {
+            //         ros_ahrs.orientation.z = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+            //     if(idx==3) {
+            //         ros_ahrs.orientation.w = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+
+            //     if(idx>=4 && idx <=12) {
+            //         ros_ahrs.orientation_covariance[idx-4] = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+
+            //     if(idx==13) {
+            //         ros_ahrs.angular_velocity.x = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+
+            //     if(idx==14) {
+            //         ros_ahrs.angular_velocity.y = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+
+            //     if(idx==15) {
+            //         ros_ahrs.angular_velocity.z = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+
+            //     if(idx>=16 && idx <=24) {
+            //         ros_ahrs.angular_velocity_covariance[idx-16] = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+
+            //     if(idx==25) {
+            //         ros_ahrs.linear_acceleration.x = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+
+            //     if(idx==26) {
+            //         ros_ahrs.linear_acceleration.y = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+
+            //     if(idx==27) {
+            //         ros_ahrs.linear_acceleration.z = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+
+            //     if(idx>=28 && idx <=36) {
+            //         ros_ahrs.linear_acceleration_covariance[idx-28] = std::stod(phrase);
+            //         ++idx;
+            //         continue;
+            //     }
+            // }
+
+
+
+
         }
         if(ahrs_dm.b_run == false) {
             return;
@@ -1053,8 +1150,8 @@ void ROSClass::DataPushThread() {
 
             float time_diff = data_time - time_stamp_data[cur_idx].first;
             if(time_diff > 0.05) {
-                std::cout<<"Time difference is too big"<<std::endl;
-                printf("Time Difference is %.2f. Dropping %s\n", time_diff, time_stamp_data[cur_idx].second.first.c_str());
+                // std::cout<<"Time difference is too big"<<std::endl;
+                // printf("[Data Push Thread] Time Difference is %.2f. Dropping %s\n", time_diff, time_stamp_data[cur_idx].second.first.c_str());
                 ++cur_idx;
                 continue;
             }

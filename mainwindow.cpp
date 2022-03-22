@@ -302,7 +302,7 @@ void MainWindow::DataListCheck(const std::string & data_dir){
             size_t rest_length = total_length - time_loc-1;
 
             std::pair<long double, ros::StringPair> time_pair{std::stold(str.substr(0, time_loc)),
-                                                              std::pair<std::string, std::string>{"radar", str.substr(time_loc+1, rest_length)}};
+                                                              std::pair<std::string, std::string>{"gps", str.substr(time_loc+1, rest_length)}};
             gps_data.push_back(time_pair);
 
         }
@@ -363,25 +363,25 @@ void MainWindow::DataListCheck(const std::string & data_dir){
     ros_->time_stamp_data.insert(ros_->time_stamp_data.end(),lidar_port_data.begin(), lidar_port_data.end());
 
     ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + lidar_starboard_data.size());
-    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(),lidar_starboard_data.begin(), lidar_starboard_data.end());
+    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(), lidar_starboard_data.begin(), lidar_starboard_data.end());
 
     ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + stereo_data.size());
-    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(),stereo_data.begin(), stereo_data.end());
+    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(), stereo_data.begin(), stereo_data.end());
 
     ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + infrared_data.size());
-    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(),infrared_data.begin(), infrared_data.end());
+    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(), infrared_data.begin(), infrared_data.end());
 
     ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + omni_data.size());
-    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(),omni_data.begin(), omni_data.end());
+    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(), omni_data.begin(), omni_data.end());
 
     ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + ahrs_data.size());
-    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(),ahrs_data.begin(), ahrs_data.end());
+    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(), ahrs_data.begin(), ahrs_data.end());
 
     ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + gps_data.size());
-    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(),gps_data.begin(), gps_data.end());
+    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(), gps_data.begin(), gps_data.end());
 
     ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + radar_data.size());
-    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(),radar_data.begin(), radar_data.end());
+    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(), radar_data.begin(), radar_data.end());
 
     if(ros_->time_stamp_data.empty()) {
         ui->total_time_label->setText(QString("Data Empty"));
