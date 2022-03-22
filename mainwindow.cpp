@@ -268,10 +268,10 @@ void MainWindow::DataListCheck(const std::string & data_dir){
 
 
 
-    sensor_data_dir = data_dir + "/ahrs";
+    sensor_data_dir = data_dir + "/navigation";
     if(std::filesystem::exists(sensor_data_dir.c_str())){
 
-        std::string ahrs_data_txt = sensor_data_dir+"/ahrs_raw.txt";
+        std::string ahrs_data_txt = sensor_data_dir+"/ahrs.txt";
         std::ifstream file(ahrs_data_txt);
         std::string str;
         while(std::getline(file, str)) {
@@ -289,76 +289,22 @@ void MainWindow::DataListCheck(const std::string & data_dir){
         data_dir_map["ahrs"] = std::pair<bool, int>{false, 0};
     }
 
-    sensor_data_dir = data_dir + "/gps";
+    sensor_data_dir = data_dir + "/navigation";
     if(std::filesystem::exists(sensor_data_dir.c_str())){
 
-        std::string gps_data_txt = sensor_data_dir+"/gps_raw.txt";
+        std::string gps_data_txt = sensor_data_dir+"/gps.txt";
         std::ifstream file(gps_data_txt);
         std::string str;
-        //get  $GNGGA, $GNRMC and $GNHDT and publish once
-        //rostime gps_time latitude longitude altitude yaw signal_type fix HDOP SOG COG
-
-        long double ros_time = 0.0f;
-        std::vector<std::string> gps_values(10, "");
-
-        bool GNGGA_data = false;
-        bool GNRMC_data = false;
-
 
         while(std::getline(file, str)) {
+            size_t time_loc = str.find_first_of("\t");
+            size_t total_length = str.length();
+            size_t rest_length = total_length - time_loc-1;
 
-            std::string phrase;
-            std::stringstream ss(str);
-            std::vector<std::string> values;
-            while(std::getline(ss, phrase, '\t')) {
-                values.push_back(phrase);
-            }
+            std::pair<long double, ros::StringPair> time_pair{std::stold(str.substr(0, time_loc)),
+                                                              std::pair<std::string, std::string>{"radar", str.substr(time_loc+1, rest_length)}};
+            gps_data.push_back(time_pair);
 
-            if(values[1].compare("$GNRMC") == 0) {
-                gps_values.clear();
-                gps_values.resize(10);
-                GNRMC_data = true;
-                GNGGA_data = false;
-
-                gps_values[1] = values[4]; //latitude
-                gps_values[2] = values[5]; //longitude
-                gps_values[5] = values[3]; //signal_type
-                gps_values[8] = values[6]; //SOG
-                gps_values[9] = values[7]; //COG
-            }
-
-            if(values[1].compare("$GNGGA") == 0) {
-                if(GNRMC_data) {
-
-                    GNGGA_data = true;
-                    gps_values[0] = values[2]; //gps_time
-                    // gps_values[1] = values[3]; //latitude
-                    // gps_values[2] = values[4]; //longitude
-                    gps_values[3] = values[7]; //altitude
-                    gps_values[6] = values[5]; //Fix
-                    gps_values[7] = values[6]; //HDOP
-                } else {
-                    continue;
-                }
-            }
-
-            if(values[1].compare("$GNHDT") == 0) {
-                if(GNGGA_data && GNRMC_data) {
-                    ros_time = std::stold(values[0]);
-
-                    gps_values[4] = values[2]; //yaw
-                    std::string all_values = gps_values[0];
-                    for(size_t i = 1; i < gps_values.size(); ++i) {
-                        all_values += "\t" + gps_values[i];
-                    }
-
-                    std::pair<long double, ros::StringPair> time_pair{ros_time,
-                                                                    std::pair<std::string, std::string>{"gps", all_values}};
-                    gps_data.push_back(time_pair);
-                }
-                GNGGA_data = false;
-                GNRMC_data = false;
-            }
         }
         data_dir_map["gps"] = std::pair<bool, int>{true, int(gps_data.size())};
 

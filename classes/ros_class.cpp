@@ -586,86 +586,27 @@ void ROSClass::AHRSThread() {
 
             std::string phrase;
             std::stringstream ss(data.second);
-            std::vector<std::string> row;
-            int idx = 0;
+            std::vector<std::string> values;
             std::string gps_data_type;
 
             while(std::getline(ss, phrase, '\t')) {
-                if(idx==0) {
-                    ros_ahrs.orientation.x = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-                if(idx==1) {
-                    ros_ahrs.orientation.y = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-                if(idx==2) {
-                    ros_ahrs.orientation.z = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-                if(idx==3) {
-                    ros_ahrs.orientation.w = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-
-                if(idx>=4 && idx <=12) {
-                    ros_ahrs.orientation_covariance[idx-4] = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-
-                if(idx==13) {
-                    ros_ahrs.angular_velocity.x = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-
-                if(idx==14) {
-                    ros_ahrs.angular_velocity.y = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-
-                if(idx==15) {
-                    ros_ahrs.angular_velocity.z = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-
-                if(idx>=16 && idx <=24) {
-                    ros_ahrs.angular_velocity_covariance[idx-16] = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-
-                if(idx==25) {
-                    ros_ahrs.linear_acceleration.x = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-
-                if(idx==26) {
-                    ros_ahrs.linear_acceleration.y = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-
-                if(idx==27) {
-                    ros_ahrs.linear_acceleration.z = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
-
-                if(idx>=28 && idx <=36) {
-                    ros_ahrs.linear_acceleration_covariance[idx-28] = std::stod(phrase);
-                    ++idx;
-                    continue;
-                }
+                values.push_back(phrase);
             }
+            if(values.size() < 10) {
+                continue;
+            }
+
+            ros_ahrs.orientation.x = std::stod(values[0]);
+            ros_ahrs.orientation.y = std::stod(values[1]);
+            ros_ahrs.orientation.z = std::stod(values[2]);
+            ros_ahrs.orientation.w = std::stod(values[3]);
+            ros_ahrs.angular_velocity.x = std::stod(values[4]);
+            ros_ahrs.angular_velocity.y = std::stod(values[5]);
+            ros_ahrs.angular_velocity.z = std::stod(values[6]);
+            ros_ahrs.linear_acceleration.x = std::stod(values[7]);
+            ros_ahrs.linear_acceleration.y = std::stod(values[8]);
+            ros_ahrs.linear_acceleration.z = std::stod(values[9]);
+
             ros_ahrs.header.frame_id = "gx5_link";
             ahrs_pub.publish(ros_ahrs);
         }
@@ -705,22 +646,22 @@ void ROSClass::GPSThread() {
                 values.push_back(phrase);
             }
 
-            //0. gps_time
-            //1. latitude
-            //2. longitude 
-            //3. altitude 
-            //4. yaw 
-            //5. signal_type 
-            //6. fix 
-            //7. HDOP 
-            //8. SOG 
-            //9. COG
-            
-            if(values[1].compare("NaN") == 0 ||
-               values[2].compare("NaN") == 0) {
+            if(values.size() < 10) {
                 continue;
             }
 
+
+            //0. gps_time
+            //1. latitude
+            //2. Hemisphere of latitude
+            //3. longitude
+            //4. Hemisphere of longitude
+            //5. Heading
+            //6. GPS quality indicator
+            //7. Number of satellites
+            //8. Horizontal dilution of precision
+            //9. Geoid height
+            
             nav_msgs::Odometry ros_gps = gps2odom(data.first, values);
 
             ros_gps.header.frame_id = "gps_link";
@@ -1065,9 +1006,9 @@ nav_msgs::Odometry ROSClass::gps2odom(long double time, std::vector<std::string>
     odom.header.stamp.fromSec(time);
 
     double latitude = std::stod(gps_data[1]);
-    double longitude = std::stod(gps_data[2]);
-    double altitude = std::stod(gps_data[3]);
-    double yaw = std::stod(gps_data[4]);
+    double longitude = std::stod(gps_data[3]);
+    double altitude = std::stod(gps_data[9]);
+    double yaw = std::stod(gps_data[5]);
 
     // bool signal_type = (gps_data[5].compare("1")==0)? true : false;
     // int fix = std::stoi(gps_data[6]);
@@ -1077,14 +1018,9 @@ nav_msgs::Odometry ROSClass::gps2odom(long double time, std::vector<std::string>
     double utmy;
     ToUtm(latitude, longitude, utmx, utmy);
 
-    odom.pose.pose.position.x = utmx - 3986631.0f;
-    odom.pose.pose.position.y = utmy - 534042.0f;
+    odom.pose.pose.position.x = utmx;
+    odom.pose.pose.position.y = utmy;
     odom.pose.pose.position.z = 0.0f;
-
-    // odom.pose.pose.position.x = 0;
-    // odom.pose.pose.position.y = 0;
-    // odom.pose.pose.position.z = 0;
-
 
     tf::Quaternion Q;
     double yaw_rad = (yaw/180.0f)*M_PI;
