@@ -1,7 +1,7 @@
 ## Ros Message Player for Pohang Dataset
 
 Inspired by IRAP file player (https://github.com/irapkaist/file_player).
-We thank them for providing the code.
+Special (and super) thanks for providing the codes.
 
 [Example video](https://www.youtube.com/watch?v=Gn_xkNfslrc)
 
