@@ -195,8 +195,8 @@ void MainWindow::DataListCheck(const std::string & data_dir){
             while(std::getline(ss, phrase, '\t')) {
                 row.push_back(phrase);
             }
-            std::pair<long double, ros::StringPair> time_pair{std::stold(row[1]), 
-                                                              std::pair<std::string, std::string>{"stereo", row[0]+".png"}};
+            std::pair<long double, ros::StringPair> time_pair{std::stold(row[0]), 
+                                                              std::pair<std::string, std::string>{"stereo", row[1]+".png"}};
             stereo_data.push_back(time_pair);                                                              
         }
         data_dir_map["stereo"] = std::pair<bool, int>{true, int(stereo_data.size())};
@@ -221,8 +221,8 @@ void MainWindow::DataListCheck(const std::string & data_dir){
             while(std::getline(ss, phrase, '\t')) {
                 row.push_back(phrase);
             }
-            std::pair<long double, ros::StringPair> time_pair{std::stold(row[1]), 
-                                                              std::pair<std::string, std::string>{"infrared", sensor_data_dir +"/images/"+row[0] + ".png"}};
+            std::pair<long double, ros::StringPair> time_pair{std::stold(row[0]), 
+                                                              std::pair<std::string, std::string>{"infrared", sensor_data_dir +"/images/"+row[1] + ".png"}};
             infrared_data.push_back(time_pair);                                                              
         }
         data_dir_map["infrared"] = std::pair<bool, int>{true, int(infrared_data.size())};
@@ -244,8 +244,8 @@ void MainWindow::DataListCheck(const std::string & data_dir){
             while(std::getline(ss, phrase, '\t')) {
                 row.push_back(phrase);
             }
-            std::pair<long double, ros::StringPair> time_pair{std::stold(row[1]), 
-                                                              std::pair<std::string, std::string>{"omni", row[0] + ".jpg"}};
+            std::pair<long double, ros::StringPair> time_pair{std::stold(row[0]), 
+                                                              std::pair<std::string, std::string>{"omni", row[1] + ".jpg"}};
             omni_data.push_back(time_pair);                                                              
         }
         data_dir_map["omni"] = std::pair<bool, int>{true, int(omni_data.size())};

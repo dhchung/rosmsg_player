@@ -801,6 +801,11 @@ void ROSClass::StereoThread() {
             cv::Mat left_img = cv::imread(left_img_dir, cv::IMREAD_COLOR);
             cv::Mat right_img = cv::imread(right_img_dir, cv::IMREAD_COLOR);
 
+            if(left_img.empty() || right_img.empty()) {
+                continue;
+            }
+
+
             std_msgs::Header left_img_msg_header;
             left_img_msg_header.frame_id = "stereo_left_link";
             left_img_msg_header.stamp.fromSec(data.first);
@@ -847,6 +852,11 @@ void ROSClass::InfraredThread() {
             int infrared_max_pixel_value = int((infrared_max_temp + 273.15f)*25); 
 
             cv::Mat infrared_img = cv::imread(data.second, CV_16UC1);
+
+            if(infrared_img.empty()) {
+                continue;
+            }
+
             for(int i = 0; i < infrared_img.rows; ++i) {
                 for(int j = 0; j < infrared_img.cols; ++j) {
                     int pixel_value = int(infrared_img.at<u_int16_t>(i, j));
@@ -933,7 +943,11 @@ void ROSClass::OmniThread() {
             load_omni_4.join();
             load_omni_5.join();
 
-
+            if(omni_img_0.empty() || omni_img_1.empty() ||
+               omni_img_2.empty() || omni_img_3.empty() ||
+               omni_img_4.empty() || omni_img_5.empty()) {
+                   continue;
+               }
 
 
             std_msgs::Header cam_0_msg_header;
