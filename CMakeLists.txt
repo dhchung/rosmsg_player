@@ -11,14 +11,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(roscpp REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(cv_bridge REQUIRED)
-find_package(image_transport REQUIRED)
-find_package(tf REQUIRED)
-find_package(nav_msgs REQUIRED)
-find_package(pcl_ros REQUIRED)
-
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
     roscpp

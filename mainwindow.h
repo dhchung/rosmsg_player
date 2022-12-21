@@ -56,6 +56,8 @@ private slots:
 
     void on_checkBox_Radar_clicked(bool checked);
 
+    void on_checkBox_Radar_Deg_clicked(bool checked);
+
 signals:
     void TimeReset();
 

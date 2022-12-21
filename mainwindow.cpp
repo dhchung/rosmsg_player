@@ -465,3 +465,8 @@ void MainWindow::on_checkBox_LiDAR_Starboard_clicked(bool checked){
 void MainWindow::on_checkBox_Radar_clicked(bool checked){
     ros_->play_Radar = checked;
 }
+
+void MainWindow::on_checkBox_Radar_Deg_clicked(bool checked)
+{
+
+}

@@ -329,6 +329,19 @@
      <string>Radar</string>
     </property>
    </widget>
+   <widget class="QCheckBox" name="checkBox_Radar_Deg">
+    <property name="geometry">
+     <rect>
+      <x>720</x>
+      <y>170</y>
+      <width>92</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Deg</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
