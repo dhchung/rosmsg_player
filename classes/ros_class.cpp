@@ -178,6 +178,35 @@ void ROSClass::Initialize(ros::NodeHandle & n){
 }
 
 void ROSClass::run() {
+
+
+    static tf2_ros::StaticTransformBroadcaster static_broadcaster;
+    geometry_msgs::TransformStamped static_transformStamped;
+
+    static_transformStamped.header.stamp = ros::Time::now();
+    static_transformStamped.header.frame_id = "lidar_front/os_sensor";
+    static_transformStamped.child_frame_id = "lidar_starboard/os_sensor";
+    static_transformStamped.transform.translation.x = -1.099783063;
+    static_transformStamped.transform.translation.y = -1.441996455;
+    static_transformStamped.transform.translation.z = 0.845223963;
+    static_transformStamped.transform.rotation.x = 0.194914430;
+    static_transformStamped.transform.rotation.y = 0.177977756;
+    static_transformStamped.transform.rotation.z = -0.740679443;
+    static_transformStamped.transform.rotation.w = 0.617840052;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "lidar_front/os_sensor";
+    static_transformStamped.child_frame_id = "lidar_port/os_sensor";
+    static_transformStamped.transform.translation.x = -0.899391890;
+    static_transformStamped.transform.translation.y = 1.571232200;
+    static_transformStamped.transform.translation.z = 0.836276829;
+    static_transformStamped.transform.rotation.x = -0.205456942;
+    static_transformStamped.transform.rotation.y = 0.202020437;
+    static_transformStamped.transform.rotation.z = 0.652350783;
+    static_transformStamped.transform.rotation.w = 0.701009095;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+
     ros::AsyncSpinner spinner(0);
     spinner.start();
     ros::waitForShutdown();
@@ -758,11 +787,13 @@ void ROSClass::GPSThread() {
             //7. Number of satellites
             //8. Horizontal dilution of precision
             //9. Geoid height
-            
-            nav_msgs::Odometry ros_gps = gps2odom(data.first, values);
+            bool valid = true;
+            nav_msgs::Odometry ros_gps = gps2odom(data.first, values, valid);
 
             ros_gps.header.frame_id = "gps_link";
-            gps_pub.publish(ros_gps);
+            if(valid) {
+                gps_pub.publish(ros_gps);
+            }
 
         }
         if(gps_dm.b_run == false) {
@@ -1112,7 +1143,7 @@ void ROSClass::ToUtm(double dlat, double dlon, double &rutmx, double &rutmy)
 
 
 
-nav_msgs::Odometry ROSClass::gps2odom(long double time, std::vector<std::string> gps_data){
+nav_msgs::Odometry ROSClass::gps2odom(long double time, std::vector<std::string> gps_data, bool & valid){
     nav_msgs::Odometry odom;
     odom.header.stamp.fromSec(time);
 
@@ -1125,6 +1156,11 @@ nav_msgs::Odometry ROSClass::gps2odom(long double time, std::vector<std::string>
     // int fix = std::stoi(gps_data[6]);
     // double HDOP = std::stoi(gps_data[7]);
 
+    if(latitude == 0 || longitude == 0 || yaw == 180.0) {
+        valid = false;
+        return odom;
+    }
+
     double utmx;
     double utmy;
     ToUtm(latitude, longitude, utmx, utmy);
@@ -1135,6 +1171,17 @@ nav_msgs::Odometry ROSClass::gps2odom(long double time, std::vector<std::string>
 
     tf::Quaternion Q;
     double yaw_rad = (yaw/180.0f)*M_PI;
+
+    //pi2pi
+    int num = std::abs(yaw_rad)/(2*M_PI);
+    float sign = yaw_rad < 0 ? -1.0 : 1.0;
+    yaw_rad = yaw_rad - sign * (2*M_PI) * num;
+    sign = yaw_rad < 0 ? -1.0 : 1.0;
+
+    if(std::abs(yaw_rad) > M_PI) {
+        yaw_rad = yaw_rad - sign * (2*M_PI);
+    }
+
     Q.setRPY(0, 0, yaw_rad);
 
     odom.pose.pose.orientation.x = Q.x();

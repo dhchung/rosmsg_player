@@ -20,6 +20,7 @@
 #include <geometry_msgs/PoseWithCovariance.h>
 #include <image_transport/image_transport.h>
 #include <tf/tf.h>
+#include <tf2_ros/static_transform_broadcaster.h>
 #include <cv_bridge/cv_bridge.h>
 
 #include <sstream>
@@ -140,7 +141,7 @@ private:
     DataManager omni_dm;
     DataManager radar_dm;
 
-    nav_msgs::Odometry gps2odom(long double time, std::vector<std::string> gps_data);
+    nav_msgs::Odometry gps2odom(long double time, std::vector<std::string> gps_data, bool & valid);
 
     long double data_time;
     long double initial_time;
