@@ -468,5 +468,5 @@ void MainWindow::on_checkBox_Radar_clicked(bool checked){
 
 void MainWindow::on_checkBox_Radar_Deg_clicked(bool checked)
 {
-
+    ros_->radar_Deg = checked;
 }
