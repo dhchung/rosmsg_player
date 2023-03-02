@@ -77,6 +77,7 @@ public:
     bool play_LiDAR_Port;
     bool play_LiDAR_Starboard;
     bool play_Radar;
+    bool radar_Deg;
 
 
 

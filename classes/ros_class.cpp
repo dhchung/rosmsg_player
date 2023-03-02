@@ -53,6 +53,7 @@ ROSClass::ROSClass(QObject * parent): QThread(parent){
     play_LiDAR_Port = false;
     play_LiDAR_Starboard = false;
     play_Radar = false;
+    radar_Deg = false;
 
 }
 
@@ -1063,30 +1064,32 @@ void ROSClass::RadarThread() {
             }
 
 
-            // cv::Mat radar_img_now = cv::imread(radar_img_path, cv::IMREAD_GRAYSCALE);
+            if(radar_Deg) {
+                double deg_start = std::stod(values[1]);
+                double deg_end = std::stod(values[2]);
 
-            double deg_start = std::stod(values[1]);
-            double deg_end = std::stod(values[2]);
+                cv::Mat R_start = cv::getRotationMatrix2D(cv::Point2d(1023.5, 1023.5), -deg_start, 2.0);
+                cv::Mat R_end = cv::getRotationMatrix2D(cv::Point2d(1023.5, 1023.5), -deg_end, 2.0);
 
-            cv::Mat R_start = cv::getRotationMatrix2D(cv::Point2d(1023.5, 1023.5), -deg_start, 2.0);
-            cv::Mat R_end = cv::getRotationMatrix2D(cv::Point2d(1023.5, 1023.5), -deg_end, 2.0);
+                cv::Mat mask_start, mask_end;
+                cv::warpAffine(radar_mask_half_rectangle, mask_start, R_start, cv::Size(2048, 2048));
+                cv::warpAffine(radar_mask_half_rectangle, mask_end, R_end, cv::Size(2048, 2048));
 
-            cv::Mat mask_start, mask_end;
-            cv::warpAffine(radar_mask_half_rectangle, mask_start, R_start, cv::Size(2048, 2048));
-            cv::warpAffine(radar_mask_half_rectangle, mask_end, R_end, cv::Size(2048, 2048));
+                cv::Mat mask_end_otherside;
+                cv::Mat R_other_side = cv::getRotationMatrix2D(cv::Point2d(1023.5, 1023.5), -(deg_start+90), 2.0);
+                cv::warpAffine(radar_mask_half_rectangle, mask_end_otherside, R_other_side, cv::Size(2048, 2048));
 
-            cv::Mat mask_end_otherside;
-            cv::Mat R_other_side = cv::getRotationMatrix2D(cv::Point2d(1023.5, 1023.5), -(deg_start+90), 2.0);
-            cv::warpAffine(radar_mask_half_rectangle, mask_end_otherside, R_other_side, cv::Size(2048, 2048));
+                cv::Mat subtract_mask, curr_mask;
 
-            cv::Mat subtract_mask, curr_mask;
+                cv::bitwise_xor(mask_start, mask_end, subtract_mask);
+                cv::bitwise_and(mask_end, subtract_mask, curr_mask);
+                cv::bitwise_and(curr_mask, mask_end_otherside, curr_mask);
 
-            cv::bitwise_xor(mask_start, mask_end, subtract_mask);
-            cv::bitwise_and(mask_end, subtract_mask, curr_mask);
-            cv::bitwise_and(curr_mask, mask_end_otherside, curr_mask);
-
-            cv::rectangle(curr_mask, cv::Rect(cv::Point(1023, 1023), cv::Point(1024, 1024)), cv::Scalar(255), -1);
-            radar_img_curr.copyTo(radar_img, curr_mask);
+                cv::rectangle(curr_mask, cv::Rect(cv::Point(1023, 1023), cv::Point(1024, 1024)), cv::Scalar(255), -1);
+                radar_img_curr.copyTo(radar_img, curr_mask);
+            } else {
+                radar_img_curr.copyTo(radar_img);
+            }
 
             std_msgs::Header radar_msg_header;
             radar_msg_header.frame_id = "radar_link";
