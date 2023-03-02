@@ -329,12 +329,12 @@ void ROSClass::DataLoaded() {
 
 void ROSClass::OnPlay() {
     // data_time = initial_time + (final_time - initial_time) * percent;
-    if(percent == 0.0f) {
+    if(data_time-initial_time == 0.0f) {
         cur_idx = 0;
     } else {
         for(int i = 0; i < time_stamp_data.size()-1; ++i) {
-            if(data_time >= time_stamp_data[i].first && data_time < time_stamp_data[i+1].first) {
-                cur_idx = i;
+            if(data_time > time_stamp_data[i].first && data_time <= time_stamp_data[i+1].first) {
+                cur_idx = i+1;
                 break;
             }
         }
@@ -362,8 +362,8 @@ void ROSClass::OnTimeReset() {
         cur_idx = 0;
     } else {
         for(int i = 0; i < time_stamp_data.size()-1; ++i) {
-            if(data_time >= time_stamp_data[i].first && data_time < time_stamp_data[i+1].first) {
-                cur_idx = i;
+            if(data_time > time_stamp_data[i].first && data_time <= time_stamp_data[i+1].first) {
+                cur_idx = i+1;
                 break;
             }
         }
