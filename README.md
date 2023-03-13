@@ -63,7 +63,7 @@ DataSetFolder
 │       └── imu.txt
 ├── radar
 │   ├── images
-│   │   ├── 000000.jpg
+│   │   ├── 000000.png
 │   │   └── ...
 │   └── timestamp.txt
 └── calibration
