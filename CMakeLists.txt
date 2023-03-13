@@ -20,6 +20,8 @@ find_package(catkin REQUIRED COMPONENTS
     image_transport
     geometry_msgs
     tf
+    tf2
+    tf2_ros
     nav_msgs
     pcl_ros
     pcl_conversions
@@ -35,6 +37,8 @@ catkin_package(
         image_transport
         geometry_msgs
         tf
+        tf2
+        tf2_ros
         nav_msgs
         pcl_ros
         pcl_conversions
