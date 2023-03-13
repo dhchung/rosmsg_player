@@ -65,7 +65,8 @@ DataSetFolder
 │   ├── images
 │   │   ├── 000000.png
 │   │   └── ...
-│   └── timestamp.txt
+│   ├── timestamp.txt
+│   └── timestamp_deg.txt
 └── calibration
     └── calibaration.json
 ```
