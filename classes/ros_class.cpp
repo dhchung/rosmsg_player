@@ -151,6 +151,9 @@ void ROSClass::Initialize(ros::NodeHandle & n){
     it_stereo_right = new image_transport::ImageTransport(nh);
     it_pub_stereo_right = it_stereo_right->advertise("/stereo_cam/right_img", 1000);
 
+    it_stereo = new image_transport::ImageTransport(nh);
+    it_pub_stereo = it_stereo->advertise("/stereo_cam/stereo_img", 1000);
+
     it_infrared = new image_transport::ImageTransport(nh);
     it_pub_infrared = it_infrared->advertise("/infrared/image", 1000);
 
@@ -837,6 +840,9 @@ void ROSClass::StereoThread() {
                 continue;
             }
 
+            cv::Mat stereo_img;
+            cv::hconcat(left_img, right_img, stereo_img);
+
 
             std_msgs::Header left_img_msg_header;
             left_img_msg_header.frame_id = "stereo_left_link";
@@ -850,6 +856,12 @@ void ROSClass::StereoThread() {
             sensor_msgs::ImagePtr right_img_msg = cv_bridge::CvImage(right_img_msg_header, "bgr8", right_img).toImageMsg();
             it_pub_stereo_right.publish(right_img_msg);
 
+            std_msgs::Header stereo_img_msg_header;
+            stereo_img_msg_header.frame_id = "stereo_link";
+            stereo_img_msg_header.stamp.fromSec(data.first);
+            sensor_msgs::ImagePtr stereo_img_msg = cv_bridge::CvImage(stereo_img_msg_header, "bgr8", stereo_img).toImageMsg();
+            it_pub_stereo.publish(stereo_img_msg);
+            
         }
         if(!stereo_dm.b_run) {
             return;

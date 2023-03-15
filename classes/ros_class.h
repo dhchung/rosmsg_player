@@ -104,6 +104,9 @@ private:
     image_transport::ImageTransport * it_stereo_right;
     image_transport::Publisher it_pub_stereo_right;
 
+    image_transport::ImageTransport * it_stereo;
+    image_transport::Publisher it_pub_stereo;
+
     image_transport::ImageTransport * it_infrared;
     image_transport::Publisher it_pub_infrared;
 
