@@ -13,6 +13,7 @@
 #include <vector>
 #include <fstream>
 #include "classes/ros_class.h"
+#include <jsoncpp/json/json.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -73,7 +74,8 @@ private:
 
     void GetTimeAndPathLidar(const std::string sensor_dir, 
                              const std::string lidar_name,
-                             std::vector<std::pair<long double, std::pair<std::string, std::string>>> & data);    
+                             std::vector<std::pair<long double, std::pair<std::string, std::string>>> & data);
+
     bool data_ready;
 
     bool time_line_slider_pressed;

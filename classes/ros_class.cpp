@@ -182,35 +182,6 @@ void ROSClass::Initialize(ros::NodeHandle & n){
 }
 
 void ROSClass::run() {
-
-
-    static tf2_ros::StaticTransformBroadcaster static_broadcaster;
-    geometry_msgs::TransformStamped static_transformStamped;
-
-    static_transformStamped.header.stamp = ros::Time::now();
-    static_transformStamped.header.frame_id = "lidar_front/os_sensor";
-    static_transformStamped.child_frame_id = "lidar_starboard/os_sensor";
-    static_transformStamped.transform.translation.x = -1.099783063;
-    static_transformStamped.transform.translation.y = -1.441996455;
-    static_transformStamped.transform.translation.z = 0.845223963;
-    static_transformStamped.transform.rotation.x = 0.194914430;
-    static_transformStamped.transform.rotation.y = 0.177977756;
-    static_transformStamped.transform.rotation.z = -0.740679443;
-    static_transformStamped.transform.rotation.w = 0.617840052;
-    static_broadcaster.sendTransform(static_transformStamped);
-
-    static_transformStamped.header.frame_id = "lidar_front/os_sensor";
-    static_transformStamped.child_frame_id = "lidar_port/os_sensor";
-    static_transformStamped.transform.translation.x = -0.899391890;
-    static_transformStamped.transform.translation.y = 1.571232200;
-    static_transformStamped.transform.translation.z = 0.836276829;
-    static_transformStamped.transform.rotation.x = -0.205456942;
-    static_transformStamped.transform.rotation.y = 0.202020437;
-    static_transformStamped.transform.rotation.z = 0.652350783;
-    static_transformStamped.transform.rotation.w = 0.701009095;
-    static_broadcaster.sendTransform(static_transformStamped);
-
-
     ros::AsyncSpinner spinner(0);
     spinner.start();
     ros::waitForShutdown();
@@ -318,6 +289,109 @@ void ROSClass::TimerCallBack(const ros::TimerEvent & event) {
 
 }
 
+void ROSClass::load_calibration(long double time) {
+    gps_tf = getTransform(jv_root["gps"]);
+    lidar_front_tf = getTransform(jv_root["lidar_front"]);
+    lidar_port_tf = getTransform(jv_root["lidar_port"]);
+    lidar_starboard_tf = getTransform(jv_root["lidar_starboard"]);
+    stereo_left_tf = getTransform(jv_root["stereo_left"]);
+    stereo_right_tf = getTransform(jv_root["stereo_right"]);
+    infrared_tf = getTransform(jv_root["infrared"]);
+    omni0_low_tf = getTransform(jv_root["omni0_low"]);
+    omni1_low_tf = getTransform(jv_root["omni1_low"]);
+    omni2_low_tf = getTransform(jv_root["omni2_low"]);
+    omni3_low_tf = getTransform(jv_root["omni3_low"]);
+    omni4_low_tf = getTransform(jv_root["omni4_low"]);
+    omni5_low_tf = getTransform(jv_root["omni5_low"]);
+
+    omni0_high_tf = getTransform(jv_root["omni0_high"]);
+    omni1_high_tf = getTransform(jv_root["omni1_high"]);
+    omni2_high_tf = getTransform(jv_root["omni2_high"]);
+    omni3_high_tf = getTransform(jv_root["omni3_high"]);
+    omni4_high_tf = getTransform(jv_root["omni4_high"]);
+    omni5_high_tf = getTransform(jv_root["omni5_high"]);
+
+    radar_low_tf = getTransform(jv_root["radar_low"]);
+    radar_high_tf = getTransform(jv_root["radar_high"]);
+
+    static tf2_ros::StaticTransformBroadcaster static_broadcaster;
+    geometry_msgs::TransformStamped static_transformStamped;
+
+    static_transformStamped.header.stamp.fromSec(time);
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "gps_link";
+    static_transformStamped.transform = gps_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "lidar_front/os_sensor";
+    static_transformStamped.transform = lidar_front_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "lidar_port/os_sensor";
+    static_transformStamped.transform = lidar_port_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "lidar_starboard/os_sensor";
+    static_transformStamped.transform = lidar_starboard_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "stereo_left_link";
+    static_transformStamped.transform = stereo_left_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "stereo_right_link";
+    static_transformStamped.transform = stereo_right_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "infrared_link";
+    static_transformStamped.transform = infrared_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    //Omnidirectional camera: default - low
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "omni0_link";
+    static_transformStamped.transform = omni0_low_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "omni1_link";
+    static_transformStamped.transform = omni1_low_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "omni2_link";
+    static_transformStamped.transform = omni2_low_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "omni3_link";
+    static_transformStamped.transform = omni3_low_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "omni4_link";
+    static_transformStamped.transform = omni4_low_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "omni5_link";
+    static_transformStamped.transform = omni5_low_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+    //radar: default-low
+    static_transformStamped.header.frame_id = "gx5_link";
+    static_transformStamped.child_frame_id = "radar_link";
+    static_transformStamped.transform = radar_low_tf;
+    static_broadcaster.sendTransform(static_transformStamped);
+
+}
+
 void ROSClass::DataLoaded() {
     initial_time = time_stamp_data[0].first;
     final_time = time_stamp_data.back().first;
@@ -328,6 +402,9 @@ void ROSClass::DataLoaded() {
     radar_img_curr = cv::Mat::zeros(cv::Size(2048, 2048), CV_8UC1);
     radar_currently_loaded = -1;
 
+    if(calibration_exists) {
+        load_calibration(data_time);
+    }
 }
 
 void ROSClass::OnPlay() {
@@ -917,7 +994,7 @@ void ROSClass::InfraredThread() {
             }
 
             std_msgs::Header infrared_msg_header;
-            infrared_msg_header.frame_id = "infrared_camera_link";
+            infrared_msg_header.frame_id = "infrared_link";
             infrared_msg_header.stamp.fromSec(data.first);
             sensor_msgs::ImagePtr infrared_img_msg = cv_bridge::CvImage(infrared_msg_header, "mono16", infrared_img).toImageMsg();
             it_pub_infrared.publish(infrared_img_msg);
@@ -995,37 +1072,37 @@ void ROSClass::OmniThread() {
 
 
             std_msgs::Header cam_0_msg_header;
-            cam_0_msg_header.frame_id = "omni_cam_0_link";
+            cam_0_msg_header.frame_id = "omni0_link";
             cam_0_msg_header.stamp.fromSec(data.first);
             sensor_msgs::ImagePtr cam_0_msg = cv_bridge::CvImage(cam_0_msg_header, "bgr8", omni_img_0).toImageMsg();
             it_pub_omni_0.publish(cam_0_msg);
 
             std_msgs::Header cam_1_msg_header;
-            cam_1_msg_header.frame_id = "omni_cam_1_link";
+            cam_1_msg_header.frame_id = "omni1_link";
             cam_1_msg_header.stamp.fromSec(data.first);
             sensor_msgs::ImagePtr cam_1_msg = cv_bridge::CvImage(cam_1_msg_header, "bgr8", omni_img_1).toImageMsg();
             it_pub_omni_1.publish(cam_1_msg);
 
             std_msgs::Header cam_2_msg_header;
-            cam_2_msg_header.frame_id = "omni_cam_2_link";
+            cam_2_msg_header.frame_id = "omni2_link";
             cam_2_msg_header.stamp.fromSec(data.first);
             sensor_msgs::ImagePtr cam_2_msg = cv_bridge::CvImage(cam_2_msg_header, "bgr8", omni_img_2).toImageMsg();
             it_pub_omni_2.publish(cam_2_msg);
 
             std_msgs::Header cam_3_msg_header;
-            cam_3_msg_header.frame_id = "omni_cam_3_link";
+            cam_3_msg_header.frame_id = "omni3_link";
             cam_3_msg_header.stamp.fromSec(data.first);
             sensor_msgs::ImagePtr cam_3_msg = cv_bridge::CvImage(cam_3_msg_header, "bgr8", omni_img_3).toImageMsg();
             it_pub_omni_3.publish(cam_3_msg);
 
             std_msgs::Header cam_4_msg_header;
-            cam_4_msg_header.frame_id = "omni_cam_4_link";
+            cam_4_msg_header.frame_id = "omni4_link";
             cam_4_msg_header.stamp.fromSec(data.first);
             sensor_msgs::ImagePtr cam_4_msg = cv_bridge::CvImage(cam_4_msg_header, "bgr8", omni_img_4).toImageMsg();
             it_pub_omni_4.publish(cam_4_msg);
 
             std_msgs::Header cam_5_msg_header;
-            cam_5_msg_header.frame_id = "omni_cam_5_link";
+            cam_5_msg_header.frame_id = "omni5_link";
             cam_5_msg_header.stamp.fromSec(data.first);
             sensor_msgs::ImagePtr cam_5_msg = cv_bridge::CvImage(cam_5_msg_header, "bgr8", omni_img_5).toImageMsg();
             it_pub_omni_5.publish(cam_5_msg);
@@ -1306,4 +1383,21 @@ void ROSClass::DataPushThread() {
 
         data_push_mutex.unlock();
     }
+}
+
+geometry_msgs::Transform ROSClass::getTransform(Json::Value value) {
+    Json::Value quaternion = value["quaternion"];
+    Json::Value translation = value["translation"];
+
+    geometry_msgs::Transform tf;
+    tf.rotation.x = quaternion[0].asDouble();
+    tf.rotation.y = quaternion[1].asDouble();
+    tf.rotation.z = quaternion[2].asDouble();
+    tf.rotation.w = quaternion[3].asDouble();
+
+    tf.translation.x = translation[0].asDouble();
+    tf.translation.y = translation[1].asDouble();
+    tf.translation.z = translation[2].asDouble();
+
+    return tf;
 }

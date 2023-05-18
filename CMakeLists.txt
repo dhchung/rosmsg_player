@@ -27,6 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
     pcl_conversions
     pcl_msgs
 )
+find_package(jsoncpp REQUIRED)
 
 catkin_package(
     CATKIN_DEPENDS
@@ -57,4 +58,5 @@ add_executable(rosmsg_player
 )
 
 target_link_libraries(rosmsg_player PRIVATE Qt5::Widgets
-                      ${catkin_LIBRARIES})
+                      ${catkin_LIBRARIES}
+                      jsoncpp)

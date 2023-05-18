@@ -355,6 +355,19 @@ void MainWindow::DataListCheck(const std::string & data_dir){
         ++row;
     }
 
+    sensor_data_dir = data_dir + "/calibration";
+    if(std::filesystem::exists(sensor_data_dir.c_str())) {
+        ros_->calibration_exists = true;
+        std::string extrinsics_path = sensor_data_dir + "/extrinsics.json";
+
+        std::ifstream stream;
+        stream.open(extrinsics_path);
+        stream >> ros_->jv_root;
+
+    } else {
+        ros_->calibration_exists = false;
+    }
+
     ros_->time_stamp_data.clear();
     ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + lidar_front_data.size());
     ros_->time_stamp_data.insert(ros_->time_stamp_data.end(),lidar_front_data.begin(), lidar_front_data.end());
