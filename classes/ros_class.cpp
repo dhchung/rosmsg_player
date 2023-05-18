@@ -290,105 +290,161 @@ void ROSClass::TimerCallBack(const ros::TimerEvent & event) {
 }
 
 void ROSClass::load_calibration(long double time) {
-    gps_tf = getTransform(jv_root["gps"]);
-    lidar_front_tf = getTransform(jv_root["lidar_front"]);
-    lidar_port_tf = getTransform(jv_root["lidar_port"]);
-    lidar_starboard_tf = getTransform(jv_root["lidar_starboard"]);
-    stereo_left_tf = getTransform(jv_root["stereo_left"]);
-    stereo_right_tf = getTransform(jv_root["stereo_right"]);
-    infrared_tf = getTransform(jv_root["infrared"]);
-    omni0_low_tf = getTransform(jv_root["omni0_low"]);
-    omni1_low_tf = getTransform(jv_root["omni1_low"]);
-    omni2_low_tf = getTransform(jv_root["omni2_low"]);
-    omni3_low_tf = getTransform(jv_root["omni3_low"]);
-    omni4_low_tf = getTransform(jv_root["omni4_low"]);
-    omni5_low_tf = getTransform(jv_root["omni5_low"]);
-
-    omni0_high_tf = getTransform(jv_root["omni0_high"]);
-    omni1_high_tf = getTransform(jv_root["omni1_high"]);
-    omni2_high_tf = getTransform(jv_root["omni2_high"]);
-    omni3_high_tf = getTransform(jv_root["omni3_high"]);
-    omni4_high_tf = getTransform(jv_root["omni4_high"]);
-    omni5_high_tf = getTransform(jv_root["omni5_high"]);
-
-    radar_low_tf = getTransform(jv_root["radar_low"]);
-    radar_high_tf = getTransform(jv_root["radar_high"]);
-
     static tf2_ros::StaticTransformBroadcaster static_broadcaster;
     geometry_msgs::TransformStamped static_transformStamped;
 
     static_transformStamped.header.stamp.fromSec(time);
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "gps_link";
-    static_transformStamped.transform = gps_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
 
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "lidar_front/os_sensor";
-    static_transformStamped.transform = lidar_front_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
+    if(jv_root.isMember("gps")) {
+        gps_tf = getTransform(jv_root["gps"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "gps_link";
+        static_transformStamped.transform = gps_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
 
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "lidar_port/os_sensor";
-    static_transformStamped.transform = lidar_port_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
+    if(jv_root.isMember("lidar_front")) {
+        lidar_front_tf = getTransform(jv_root["lidar_front"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "lidar_front/os_sensor";
+        static_transformStamped.transform = lidar_front_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
 
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "lidar_starboard/os_sensor";
-    static_transformStamped.transform = lidar_starboard_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
+    if(jv_root.isMember("lidar_port")){
+        lidar_port_tf = getTransform(jv_root["lidar_port"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "lidar_port/os_sensor";
+        static_transformStamped.transform = lidar_port_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("lidar_starboard")){
+        lidar_starboard_tf = getTransform(jv_root["lidar_starboard"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "lidar_starboard/os_sensor";
+        static_transformStamped.transform = lidar_starboard_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("stereo_left")){
+        stereo_left_tf = getTransform(jv_root["stereo_left"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "stereo_left_link";
+        static_transformStamped.transform = stereo_left_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("stereo_right")){
+        stereo_right_tf = getTransform(jv_root["stereo_right"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "stereo_right_link";
+        static_transformStamped.transform = stereo_right_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("infrared")){
+        infrared_tf = getTransform(jv_root["infrared"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "infrared_link";
+        static_transformStamped.transform = infrared_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni0_low")){
+        omni0_low_tf = getTransform(jv_root["omni0_low"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni0_low_link";
+        static_transformStamped.transform = omni0_low_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni1_low")){
+        omni1_low_tf = getTransform(jv_root["omni1_low"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni1_low_link";
+        static_transformStamped.transform = omni1_low_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni2_low")){
+        omni2_low_tf = getTransform(jv_root["omni2_low"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni2_low_link";
+        static_transformStamped.transform = omni2_low_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni3_low")){
+        omni3_low_tf = getTransform(jv_root["omni3_low"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni3_low_link";
+        static_transformStamped.transform = omni3_low_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni4_low")){
+        omni4_low_tf = getTransform(jv_root["omni4_low"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni4_low_link";
+        static_transformStamped.transform = omni4_low_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni5_low")){
+        omni5_low_tf = getTransform(jv_root["omni5_low"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni5_low_link";
+        static_transformStamped.transform = omni5_low_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni0_high")){
+        omni0_high_tf = getTransform(jv_root["omni0_high"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni0_high_link";
+        static_transformStamped.transform = omni0_high_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni1_high")){
+        omni1_high_tf = getTransform(jv_root["omni1_high"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni1_high_link";
+        static_transformStamped.transform = omni1_high_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni2_high")){
+        omni2_high_tf = getTransform(jv_root["omni2_high"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni2_high_link";
+        static_transformStamped.transform = omni2_high_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni3_high")){
+        omni3_high_tf = getTransform(jv_root["omni3_high"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni3_high_link";
+        static_transformStamped.transform = omni3_high_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni4_high")){
+        omni4_high_tf = getTransform(jv_root["omni4_high"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni4_high_link";
+        static_transformStamped.transform = omni4_high_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("omni5_high")){
+        omni5_high_tf = getTransform(jv_root["omni5_high"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "omni5_high_link";
+        static_transformStamped.transform = omni5_low_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
 
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "stereo_left_link";
-    static_transformStamped.transform = stereo_left_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
-
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "stereo_right_link";
-    static_transformStamped.transform = stereo_right_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
-
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "infrared_link";
-    static_transformStamped.transform = infrared_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
-
-    //Omnidirectional camera: default - low
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "omni0_link";
-    static_transformStamped.transform = omni0_low_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
-
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "omni1_link";
-    static_transformStamped.transform = omni1_low_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
-
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "omni2_link";
-    static_transformStamped.transform = omni2_low_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
-
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "omni3_link";
-    static_transformStamped.transform = omni3_low_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
-
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "omni4_link";
-    static_transformStamped.transform = omni4_low_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
-
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "omni5_link";
-    static_transformStamped.transform = omni5_low_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
-
-    //radar: default-low
-    static_transformStamped.header.frame_id = "gx5_link";
-    static_transformStamped.child_frame_id = "radar_link";
-    static_transformStamped.transform = radar_low_tf;
-    static_broadcaster.sendTransform(static_transformStamped);
+    if(jv_root.isMember("radar_low")){
+        radar_low_tf = getTransform(jv_root["radar_low"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "radar_low_link";
+        static_transformStamped.transform = radar_low_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
+    if(jv_root.isMember("radar_high")){
+        radar_high_tf = getTransform(jv_root["radar_high"]);
+        static_transformStamped.header.frame_id = "gx5_link";
+        static_transformStamped.child_frame_id = "radar_high_link";
+        static_transformStamped.transform = radar_high_tf;
+        static_broadcaster.sendTransform(static_transformStamped);
+    }
 
 }
 

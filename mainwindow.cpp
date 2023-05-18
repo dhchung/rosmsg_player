@@ -363,6 +363,7 @@ void MainWindow::DataListCheck(const std::string & data_dir){
         std::ifstream stream;
         stream.open(extrinsics_path);
         stream >> ros_->jv_root;
+        stream.close();
 
     } else {
         ros_->calibration_exists = false;
