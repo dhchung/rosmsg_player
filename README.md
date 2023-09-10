@@ -1,4 +1,4 @@
-## Ros Message Player for Pohang Dataset
+## ROS Message Player for Pohang Dataset
 
 [![Example video](doc/youtube_preview.jpg)](https://youtu.be/VTmhBDnO0-o)
 Example video
