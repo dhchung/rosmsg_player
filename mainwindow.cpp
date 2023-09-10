@@ -297,19 +297,23 @@ void MainWindow::DataListCheck(const std::string & data_dir){
 
         std::string gps_data_txt = sensor_data_dir+"/gps.txt";
         std::ifstream file(gps_data_txt);
-        std::string str;
+        if(!file.fail()) {
+            std::string str;
 
-        while(std::getline(file, str)) {
-            size_t time_loc = str.find_first_of("\t");
-            size_t total_length = str.length();
-            size_t rest_length = total_length - time_loc-1;
+            while(std::getline(file, str)) {
+                size_t time_loc = str.find_first_of("\t");
+                size_t total_length = str.length();
+                size_t rest_length = total_length - time_loc-1;
 
-            std::pair<long double, ros::StringPair> time_pair{std::stold(str.substr(0, time_loc)),
-                                                              std::pair<std::string, std::string>{"gps", str.substr(time_loc+1, rest_length)}};
-            gps_data.push_back(time_pair);
+                std::pair<long double, ros::StringPair> time_pair{std::stold(str.substr(0, time_loc)),
+                                                                std::pair<std::string, std::string>{"gps", str.substr(time_loc+1, rest_length)}};
+                gps_data.push_back(time_pair);
 
+            }
+            data_dir_map["gps"] = std::pair<bool, int>{true, int(gps_data.size())};
+        } else {
+            data_dir_map["gps"] = std::pair<bool, int>{false, 0};
         }
-        data_dir_map["gps"] = std::pair<bool, int>{true, int(gps_data.size())};
 
     } else {
         data_dir_map["gps"] = std::pair<bool, int>{false, 0};
