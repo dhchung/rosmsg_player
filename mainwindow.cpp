@@ -273,18 +273,21 @@ void MainWindow::DataListCheck(const std::string & data_dir){
 
         std::string ahrs_data_txt = sensor_data_dir+"/ahrs.txt";
         std::ifstream file(ahrs_data_txt);
-        std::string str;
-        while(std::getline(file, str)) {
-            size_t time_loc = str.find_first_of("\t");
-            size_t total_length = str.length();
-            size_t rest_length = total_length - time_loc-1;
+        if(!file.fail()) {
+            std::string str;
+            while(std::getline(file, str)) {
+                size_t time_loc = str.find_first_of("\t");
+                size_t total_length = str.length();
+                size_t rest_length = total_length - time_loc-1;
 
-            std::pair<long double, ros::StringPair> time_pair{std::stold(str.substr(0, time_loc)),
-                                                              std::pair<std::string, std::string>{"ahrs", str.substr(time_loc+1, rest_length)}};
-            ahrs_data.push_back(time_pair);
+                std::pair<long double, ros::StringPair> time_pair{std::stold(str.substr(0, time_loc)),
+                                                                std::pair<std::string, std::string>{"ahrs", str.substr(time_loc+1, rest_length)}};
+                ahrs_data.push_back(time_pair);
+            }
+            data_dir_map["ahrs"] = std::pair<bool, int>{true, int(ahrs_data.size())};
+        } else {
+            data_dir_map["ahrs"] = std::pair<bool, int>{false, 0};
         }
-        data_dir_map["ahrs"] = std::pair<bool, int>{true, int(ahrs_data.size())};
-
     } else {
         data_dir_map["ahrs"] = std::pair<bool, int>{false, 0};
     }
