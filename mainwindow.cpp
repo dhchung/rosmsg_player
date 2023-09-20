@@ -129,7 +129,7 @@ void MainWindow::GetTimeAndPathLidar(const std::string sensor_dir,
             size_t length = bin_loc - slash_loc -1;
 
             std::pair<long double, std::pair<std::string, std::string>> time_pair{
-                std::stold(filename.substr(slash_loc+1, length))/1e9, 
+                std::stold(filename.substr(slash_loc+1, length))/1e9 + 0.1, // LiDAR message publishes aroung 0.1 seconds after its message time 
                 std::pair<std::string, std::string>{lidar_name, pt_dir+"/"+filename}
             };
 

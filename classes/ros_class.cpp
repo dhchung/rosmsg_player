@@ -575,7 +575,7 @@ void ROSClass::LidarFrontThread() {
 
             pcl::toROSMsg(pcl_cloud, ros_cloud);
             
-            ros_cloud.header.stamp.fromSec(data.first);
+            ros_cloud.header.stamp.fromSec(data.first - 0.1); // Back to original LiDAR message time
             ros_cloud.header.frame_id = "lidar_front/os_sensor";
             lidar_front_pub.publish(ros_cloud);
 
@@ -651,7 +651,7 @@ void ROSClass::LidarPortThread() {
 
             pcl::toROSMsg(pcl_cloud, ros_cloud);
 
-            ros_cloud.header.stamp.fromSec(data.first);
+            ros_cloud.header.stamp.fromSec(data.first - 0.1); // Back to original LiDAR message time
             ros_cloud.header.frame_id = "lidar_port/os_sensor";
             lidar_port_pub.publish(ros_cloud);
 
@@ -727,7 +727,7 @@ void ROSClass::LidarStarboardThread() {
             is.close();
 
             pcl::toROSMsg(pcl_cloud, ros_cloud);
-            ros_cloud.header.stamp.fromSec(data.first);
+            ros_cloud.header.stamp.fromSec(data.first - 0.1); // Back to original LiDAR message time
             ros_cloud.header.frame_id = "lidar_starboard/os_sensor";
             lidar_starboard_pub.publish(ros_cloud);
 
