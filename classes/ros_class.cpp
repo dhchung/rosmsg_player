@@ -563,7 +563,7 @@ void ROSClass::LidarFrontThread() {
                 pt.y = y;
                 pt.z = z;
                 pt.intensity = intensity;
-                pt.ring = (pt_no%64);
+                pt.ring = (pt_no/2048);
                 pt.t = time;
                 pt.reflectivity = reflectivity;
                 pt.ambient = ambient;
@@ -639,7 +639,7 @@ void ROSClass::LidarPortThread() {
                 pt.y = y;
                 pt.z = z;
                 pt.intensity = intensity;
-                pt.ring = (pt_no%32);
+                pt.ring = (pt_no/2048);
                 pt.t = time;
                 pt.reflectivity = reflectivity;
                 pt.ambient = ambient;
@@ -716,7 +716,7 @@ void ROSClass::LidarStarboardThread() {
                 pt.y = y;
                 pt.z = z;
                 pt.intensity = intensity;
-                pt.ring = (pt_no%64);
+                pt.ring = (pt_no/2048);
                 pt.t = time;
                 pt.reflectivity = reflectivity;
                 pt.ambient = ambient;
