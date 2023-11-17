@@ -61,6 +61,9 @@ ROSClass::~ROSClass(){
     lidar_front_dm.b_run = false;
     lidar_port_dm.b_run = false;
     lidar_starboard_dm.b_run = false;
+    lidar_front_IMU_dm.b_run = false;
+    lidar_port_IMU_dm.b_run = false;
+    lidar_starboard_IMU_dm.b_run = false;
     ahrs_dm.b_run = false;
     gps_dm.b_run = false;
     stereo_dm.b_run = false;
@@ -73,6 +76,9 @@ ROSClass::~ROSClass(){
     lidar_front_dm.m_cv.notify_all();
     lidar_port_dm.m_cv.notify_all();
     lidar_starboard_dm.m_cv.notify_all();
+    lidar_front_IMU_dm.m_cv.notify_all();
+    lidar_port_IMU_dm.m_cv.notify_all();
+    lidar_starboard_IMU_dm.m_cv.notify_all();
     ahrs_dm.m_cv.notify_all();
     gps_dm.m_cv.notify_all();
     stereo_dm.m_cv.notify_all();
@@ -101,6 +107,21 @@ ROSClass::~ROSClass(){
     if(lidar_starboard_dm.m_thread.joinable()) {
         lidar_starboard_dm.m_thread.join();
         std::cout<<"Starboard Lidar Thread Joined"<<std::endl;
+    }
+
+    if(lidar_front_IMU_dm.m_thread.joinable()) {
+        lidar_front_IMU_dm.m_thread.join();
+        std::cout<<"Front Lidar IMU Thread Joined"<<std::endl;
+    }
+
+    if(lidar_port_IMU_dm.m_thread.joinable()) {
+        lidar_port_IMU_dm.m_thread.join();
+        std::cout<<"Port Lidar IMU Thread Joined"<<std::endl;
+    }
+
+    if(lidar_starboard_IMU_dm.m_thread.joinable()) {
+        lidar_starboard_IMU_dm.m_thread.join();
+        std::cout<<"Starboard Lidar IMU Thread Joined"<<std::endl;
     }
 
     if(ahrs_dm.m_thread.joinable()) {
@@ -142,6 +163,11 @@ void ROSClass::Initialize(ros::NodeHandle & n){
     lidar_front_pub = nh.advertise<sensor_msgs::PointCloud2>("/lidar_front/os_cloud_node/points", 1000);
     lidar_port_pub = nh.advertise<sensor_msgs::PointCloud2>("/lidar_port/os_cloud_node/points", 1000);
     lidar_starboard_pub = nh.advertise<sensor_msgs::PointCloud2>("/lidar_starboard/os_cloud_node/points", 1000);
+
+    lidar_front_imu_pub = nh.advertise<sensor_msgs::Imu>("/lidar_front/os_cloud_node/imu", 1000);
+    lidar_port_imu_pub = nh.advertise<sensor_msgs::Imu>("/lidar_port/os_cloud_node/imu", 1000);
+    lidar_starboard_imu_pub = nh.advertise<sensor_msgs::Imu>("/lidar_starboard/os_cloud_node/imu", 1000);
+
     ahrs_pub = nh.advertise<sensor_msgs::Imu>("/gx5/imu/data", 1000);
     gps_pub = nh.advertise<nav_msgs::Odometry>("/gps_nav", 1000);
 
@@ -206,6 +232,21 @@ void ROSClass::SetThreads() {
         lidar_starboard_dm.m_thread.join();
     }
 
+    lidar_front_IMU_dm.b_run = false;
+    if(lidar_front_IMU_dm.m_thread.joinable()) {
+        lidar_front_IMU_dm.m_thread.join();
+    }
+
+    lidar_port_IMU_dm.b_run = false;
+    if(lidar_port_IMU_dm.m_thread.joinable()) {
+        lidar_port_IMU_dm.m_thread.join();
+    }
+
+    lidar_starboard_IMU_dm.b_run = false;
+    if(lidar_starboard_IMU_dm.m_thread.joinable()) {
+        lidar_starboard_IMU_dm.m_thread.join();
+    }
+
     ahrs_dm.b_run = false;
     if(ahrs_dm.m_thread.joinable()) {
         ahrs_dm.m_thread.join();
@@ -244,6 +285,16 @@ void ROSClass::SetThreads() {
 
     lidar_starboard_dm.b_run = true;
     lidar_starboard_dm.m_thread = std::thread(&ROSClass::LidarStarboardThread, this);
+
+
+    lidar_front_IMU_dm.b_run = true;
+    lidar_front_IMU_dm.m_thread = std::thread(&ROSClass::LidarFrontIMUThread, this);
+
+    lidar_port_IMU_dm.b_run = true;
+    lidar_port_IMU_dm.m_thread = std::thread(&ROSClass::LidarPortIMUThread, this);
+
+    lidar_starboard_IMU_dm.b_run = true;
+    lidar_starboard_IMU_dm.m_thread = std::thread(&ROSClass::LidarStarboardIMUThread, this);
 
     ahrs_dm.b_run = true;
     ahrs_dm.m_thread = std::thread(&ROSClass::AHRSThread, this);
@@ -484,6 +535,9 @@ void ROSClass::OnTimeReset() {
     lidar_front_dm.clear();
     lidar_port_dm.clear();
     lidar_starboard_dm.clear();
+    lidar_front_IMU_dm.clear();
+    lidar_port_IMU_dm.clear();
+    lidar_starboard_IMU_dm.clear();
     ahrs_dm.clear();
     gps_dm.clear();
     stereo_dm.clear();
@@ -738,6 +792,166 @@ void ROSClass::LidarStarboardThread() {
         }
     }
 }
+
+void ROSClass::LidarFrontIMUThread() {
+    while(1) {
+        std::unique_lock<std::mutex> ul(lidar_front_IMU_dm.m_mutex);
+        lidar_front_IMU_dm.m_cv.wait(ul);
+        if(!lidar_front_IMU_dm.b_run) {
+            ul.unlock();
+            return;
+        }
+        ul.unlock();
+
+        while(!lidar_front_IMU_dm.m_data_queue.empty()) {
+            if(!lidar_front_IMU_dm.b_run) {
+                return;
+            }
+            std::pair<long double, std::string> data = lidar_front_IMU_dm.pop();
+            float time_diff = data_time - data.first;
+            if(abs(time_diff) > 0.4) {
+                printf("Time Difference is %.2f. Dropping LiDAR front IMU\n", time_diff);
+                continue;
+            }
+
+            sensor_msgs::Imu ros_lidar_front_imu;
+            ros_lidar_front_imu.header.stamp.fromSec(data.first);
+
+            std::string phrase;
+            std::stringstream ss(data.second);
+            std::vector<std::string> values;
+            std::string gps_data_type;
+
+            while(std::getline(ss, phrase, '\t')) {
+                values.push_back(phrase);
+            }
+            if(values.size() < 6) {
+                continue;
+            }
+
+            ros_lidar_front_imu.angular_velocity.x = std::stod(values[0]);
+            ros_lidar_front_imu.angular_velocity.y = std::stod(values[1]);
+            ros_lidar_front_imu.angular_velocity.z = std::stod(values[2]);
+            ros_lidar_front_imu.linear_acceleration.x = std::stod(values[3]);
+            ros_lidar_front_imu.linear_acceleration.y = std::stod(values[4]);
+            ros_lidar_front_imu.linear_acceleration.z = std::stod(values[5]);
+
+            ros_lidar_front_imu.header.frame_id = "lidar_front/os_sensor";
+            lidar_front_imu_pub.publish(ros_lidar_front_imu);
+        }
+        if(lidar_front_IMU_dm.b_run == false) {
+            return;
+        }
+    }
+}
+
+
+void ROSClass::LidarPortIMUThread() {
+    while(1) {
+        std::unique_lock<std::mutex> ul(lidar_port_IMU_dm.m_mutex);
+        lidar_port_IMU_dm.m_cv.wait(ul);
+        if(!lidar_port_IMU_dm.b_run) {
+            ul.unlock();
+            return;
+        }
+        ul.unlock();
+
+        while(!lidar_port_IMU_dm.m_data_queue.empty()) {
+            if(!lidar_port_IMU_dm.b_run) {
+                return;
+            }
+            std::pair<long double, std::string> data = lidar_port_IMU_dm.pop();
+            float time_diff = data_time - data.first;
+            if(abs(time_diff) > 0.4) {
+                printf("Time Difference is %.2f. Dropping LiDAR port IMU\n", time_diff);
+                continue;
+            }
+
+            sensor_msgs::Imu ros_lidar_port_imu;
+            ros_lidar_port_imu.header.stamp.fromSec(data.first);
+
+            std::string phrase;
+            std::stringstream ss(data.second);
+            std::vector<std::string> values;
+            std::string gps_data_type;
+
+            while(std::getline(ss, phrase, '\t')) {
+                values.push_back(phrase);
+            }
+            if(values.size() < 6) {
+                continue;
+            }
+
+            ros_lidar_port_imu.angular_velocity.x = std::stod(values[0]);
+            ros_lidar_port_imu.angular_velocity.y = std::stod(values[1]);
+            ros_lidar_port_imu.angular_velocity.z = std::stod(values[2]);
+            ros_lidar_port_imu.linear_acceleration.x = std::stod(values[3]);
+            ros_lidar_port_imu.linear_acceleration.y = std::stod(values[4]);
+            ros_lidar_port_imu.linear_acceleration.z = std::stod(values[5]);
+
+            ros_lidar_port_imu.header.frame_id = "lidar_port/os_sensor";
+            lidar_port_imu_pub.publish(ros_lidar_port_imu);
+        }
+        if(lidar_port_IMU_dm.b_run == false) {
+            return;
+        }
+    }
+}
+
+
+void ROSClass::LidarStarboardIMUThread() {
+    while(1) {
+        std::unique_lock<std::mutex> ul(lidar_starboard_IMU_dm.m_mutex);
+        lidar_starboard_IMU_dm.m_cv.wait(ul);
+        if(!lidar_starboard_IMU_dm.b_run) {
+            ul.unlock();
+            return;
+        }
+        ul.unlock();
+
+        while(!lidar_starboard_IMU_dm.m_data_queue.empty()) {
+            if(!lidar_starboard_IMU_dm.b_run) {
+                return;
+            }
+            std::pair<long double, std::string> data = lidar_starboard_IMU_dm.pop();
+            float time_diff = data_time - data.first;
+            if(abs(time_diff) > 0.4) {
+                printf("Time Difference is %.2f. Dropping LiDAR starboard IMU\n", time_diff);
+                continue;
+            }
+
+            sensor_msgs::Imu ros_lidar_starboard_imu;
+            ros_lidar_starboard_imu.header.stamp.fromSec(data.first);
+
+            std::string phrase;
+            std::stringstream ss(data.second);
+            std::vector<std::string> values;
+            std::string gps_data_type;
+
+            while(std::getline(ss, phrase, '\t')) {
+                values.push_back(phrase);
+            }
+            if(values.size() < 6) {
+                continue;
+            }
+
+            ros_lidar_starboard_imu.angular_velocity.x = std::stod(values[0]);
+            ros_lidar_starboard_imu.angular_velocity.y = std::stod(values[1]);
+            ros_lidar_starboard_imu.angular_velocity.z = std::stod(values[2]);
+            ros_lidar_starboard_imu.linear_acceleration.x = std::stod(values[3]);
+            ros_lidar_starboard_imu.linear_acceleration.y = std::stod(values[4]);
+            ros_lidar_starboard_imu.linear_acceleration.z = std::stod(values[5]);
+
+            ros_lidar_starboard_imu.header.frame_id = "lidar_starboard/os_sensor";
+            lidar_starboard_imu_pub.publish(ros_lidar_starboard_imu);
+        }
+        if(lidar_starboard_IMU_dm.b_run == false) {
+            return;
+        }
+    }
+}
+
+
 
 void ROSClass::AHRSThread() {
     while(1){
@@ -1387,6 +1601,28 @@ void ROSClass::DataPushThread() {
                 };
                 lidar_starboard_dm.push(time_path);
                 lidar_starboard_dm.m_cv.notify_all();
+            }else if(time_stamp_data[cur_idx].second.first.compare("lidar_front_IMU") == 0 && play_LiDAR_Front) {
+                std::pair<long double, std::string> time_path{
+                    time_stamp_data[cur_idx].first,
+                    time_stamp_data[cur_idx].second.second
+                };
+                lidar_front_IMU_dm.push(time_path);
+                lidar_front_IMU_dm.m_cv.notify_all();
+
+            }else if(time_stamp_data[cur_idx].second.first.compare("lidar_port_IMU") == 0 && play_LiDAR_Port) {
+                std::pair<long double, std::string> time_path{
+                    time_stamp_data[cur_idx].first,
+                    time_stamp_data[cur_idx].second.second
+                };
+                lidar_port_IMU_dm.push(time_path);
+                lidar_port_IMU_dm.m_cv.notify_all();
+            }else if(time_stamp_data[cur_idx].second.first.compare("lidar_starboard_IMU") == 0 && play_LiDAR_Starboard) {
+                std::pair<long double, std::string> time_path{
+                    time_stamp_data[cur_idx].first,
+                    time_stamp_data[cur_idx].second.second
+                };
+                lidar_starboard_IMU_dm.push(time_path);
+                lidar_starboard_IMU_dm.m_cv.notify_all();
             }else if(time_stamp_data[cur_idx].second.first.compare("ahrs") == 0 && play_AHRS) {
                 std::pair<long double, std::string> time_data{
                     time_stamp_data[cur_idx].first,

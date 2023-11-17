@@ -98,6 +98,10 @@ private:
     ros::Publisher lidar_port_pub;
     ros::Publisher lidar_starboard_pub;
     ros::Publisher ahrs_pub;
+    ros::Publisher lidar_front_imu_pub;
+    ros::Publisher lidar_port_imu_pub;
+    ros::Publisher lidar_starboard_imu_pub;
+
     ros::Publisher gps_pub;
 
     image_transport::ImageTransport * it_stereo_left;
@@ -140,6 +144,11 @@ private:
     DataManager lidar_front_dm;
     DataManager lidar_port_dm;
     DataManager lidar_starboard_dm;
+
+    DataManager lidar_front_IMU_dm;
+    DataManager lidar_port_IMU_dm;
+    DataManager lidar_starboard_IMU_dm;
+
     DataManager ahrs_dm;
     DataManager gps_dm;
     DataManager stereo_dm;
@@ -198,6 +207,11 @@ private:
     void LidarFrontThread();
     void LidarPortThread();
     void LidarStarboardThread();
+
+    void LidarFrontIMUThread();
+    void LidarPortIMUThread();
+    void LidarStarboardIMUThread();
+
     void AHRSThread();
     void GPSThread();
     void StereoThread();

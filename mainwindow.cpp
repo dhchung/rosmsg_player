@@ -32,6 +32,9 @@ void MainWindow::OnInitialization(){
     data_dir_map["lidar_front"] = std::pair<bool, int>{false, 0};
     data_dir_map["lidar_port"] = std::pair<bool, int>{false, 0};
     data_dir_map["lidar_starboard"] = std::pair<bool, int>{false, 0};
+    data_dir_map["lidar_front_IMU"] = std::pair<bool, int>{false, 0};
+    data_dir_map["lidar_port_IMU"] = std::pair<bool, int>{false, 0};
+    data_dir_map["lidar_starboard_IMU"] = std::pair<bool, int>{false, 0};
     data_dir_map["ahrs"] = std::pair<bool, int>{false, 0};
     data_dir_map["gps"] = std::pair<bool, int>{false, 0};
     data_dir_map["stereo"] = std::pair<bool, int>{false, 0};
@@ -146,6 +149,9 @@ void MainWindow::DataListCheck(const std::string & data_dir){
     std::vector<std::pair<long double, std::pair<std::string, std::string>>> lidar_front_data;
     std::vector<std::pair<long double, std::pair<std::string, std::string>>> lidar_port_data;
     std::vector<std::pair<long double, std::pair<std::string, std::string>>> lidar_starboard_data;
+    std::vector<std::pair<long double, std::pair<std::string, std::string>>> lidar_front_IMU_data;
+    std::vector<std::pair<long double, std::pair<std::string, std::string>>> lidar_port_IMU_data;
+    std::vector<std::pair<long double, std::pair<std::string, std::string>>> lidar_starboard_IMU_data;
     std::vector<std::pair<long double, std::pair<std::string, std::string>>> stereo_data;
     std::vector<std::pair<long double, std::pair<std::string, std::string>>> infrared_data;
     std::vector<std::pair<long double, std::pair<std::string, std::string>>> omni_data;
@@ -158,26 +164,81 @@ void MainWindow::DataListCheck(const std::string & data_dir){
         GetTimeAndPathLidar(sensor_data_dir, "lidar_front", lidar_front_data);
         data_dir_map["lidar_front"] = std::pair<bool, int>{true, int(lidar_front_data.size())};
 
+        std::string lidar_front_imu_data_txt = sensor_data_dir+"/imu.txt";
+        std::ifstream file(lidar_front_imu_data_txt);
+        if(!file.fail()) {
+            std::string str;
+            while(std::getline(file, str)) {
+                size_t time_loc = str.find_first_of("\t");
+                size_t total_length = str.length();
+                size_t rest_length = total_length - time_loc-1;
+
+                std::pair<long double, ros::StringPair> time_pair{std::stold(str.substr(0, time_loc)),
+                                                                std::pair<std::string, std::string>{"lidar_front_IMU", str.substr(time_loc+1, rest_length)}};
+                lidar_front_IMU_data.push_back(time_pair);
+            }
+            data_dir_map["lidar_front_IMU"] = std::pair<bool, int>{true, int(lidar_front_IMU_data.size())};
+        } else {
+            data_dir_map["lidar_front_IMU"] = std::pair<bool, int>{false, 0};
+        }
     } else {
         data_dir_map["lidar_front"] = std::pair<bool, int>{false, 0};
+        data_dir_map["lidar_front_IMU"] = std::pair<bool, int>{false, 0};
     }
+
 
     sensor_data_dir = data_dir + "/lidar/lidar_port";
     if(std::filesystem::exists(sensor_data_dir.c_str())){
         GetTimeAndPathLidar(sensor_data_dir, "lidar_port", lidar_port_data);
         data_dir_map["lidar_port"] = std::pair<bool, int>{true, int(lidar_port_data.size())};
 
+        std::string lidar_port_imu_data_txt = sensor_data_dir+"/imu.txt";
+        std::ifstream file(lidar_port_imu_data_txt);
+        if(!file.fail()) {
+            std::string str;
+            while(std::getline(file, str)) {
+                size_t time_loc = str.find_first_of("\t");
+                size_t total_length = str.length();
+                size_t rest_length = total_length - time_loc-1;
+
+                std::pair<long double, ros::StringPair> time_pair{std::stold(str.substr(0, time_loc)),
+                                                                std::pair<std::string, std::string>{"lidar_port_IMU", str.substr(time_loc+1, rest_length)}};
+                lidar_port_IMU_data.push_back(time_pair);
+            }
+            data_dir_map["lidar_port_IMU"] = std::pair<bool, int>{true, int(lidar_port_IMU_data.size())};
+        } else {
+            data_dir_map["lidar_port_IMU"] = std::pair<bool, int>{false, 0};
+        }
     } else {
         data_dir_map["lidar_port"] = std::pair<bool, int>{false, 0};
+        data_dir_map["lidar_port_IMU"] = std::pair<bool, int>{false, 0};
     }
 
     sensor_data_dir = data_dir + "/lidar/lidar_starboard";
     if(std::filesystem::exists(sensor_data_dir.c_str())){
         GetTimeAndPathLidar(sensor_data_dir, "lidar_starboard", lidar_starboard_data);
         data_dir_map["lidar_starboard"] = std::pair<bool, int>{true, int(lidar_starboard_data.size())};
+        
+        std::string lidar_starboard_imu_data_txt = sensor_data_dir+"/imu.txt";
+        std::ifstream file(lidar_starboard_imu_data_txt);
+        if(!file.fail()) {
+            std::string str;
+            while(std::getline(file, str)) {
+                size_t time_loc = str.find_first_of("\t");
+                size_t total_length = str.length();
+                size_t rest_length = total_length - time_loc-1;
 
+                std::pair<long double, ros::StringPair> time_pair{std::stold(str.substr(0, time_loc)),
+                                                                std::pair<std::string, std::string>{"lidar_starboard_IMU", str.substr(time_loc+1, rest_length)}};
+                lidar_starboard_IMU_data.push_back(time_pair);
+            }
+            data_dir_map["lidar_starboard_IMU"] = std::pair<bool, int>{true, int(lidar_starboard_IMU_data.size())};
+        } else {
+            data_dir_map["lidar_starboard_IMU"] = std::pair<bool, int>{false, 0};
+        }
     } else {
         data_dir_map["lidar_starboard"] = std::pair<bool, int>{false, 0};
+        data_dir_map["lidar_starboard_IMU"] = std::pair<bool, int>{false, 0};
     }
 
     sensor_data_dir = data_dir + "/stereo";
@@ -385,6 +446,15 @@ void MainWindow::DataListCheck(const std::string & data_dir){
 
     ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + lidar_starboard_data.size());
     ros_->time_stamp_data.insert(ros_->time_stamp_data.end(), lidar_starboard_data.begin(), lidar_starboard_data.end());
+
+    ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + lidar_front_IMU_data.size());
+    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(),lidar_front_IMU_data.begin(), lidar_front_IMU_data.end());
+
+    ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + lidar_port_IMU_data.size());
+    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(),lidar_port_IMU_data.begin(), lidar_port_IMU_data.end());
+
+    ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + lidar_starboard_IMU_data.size());
+    ros_->time_stamp_data.insert(ros_->time_stamp_data.end(), lidar_starboard_IMU_data.begin(), lidar_starboard_IMU_data.end());
 
     ros_->time_stamp_data.reserve(ros_->time_stamp_data.size() + stereo_data.size());
     ros_->time_stamp_data.insert(ros_->time_stamp_data.end(), stereo_data.begin(), stereo_data.end());
